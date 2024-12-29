@@ -1,7 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Post, Category
 from datetime import datetime
 from django.http import Http404
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 
 def index(request):
@@ -45,3 +48,21 @@ def category_posts(request, category_slug):
         'post_list': category_posts
     }
     return render(request, 'blog/category.html', context)
+
+
+def registration(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('login')  # Перенаправление на страницу входа
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/registration.html', {'form': form})
+
+
+@login_required
+def profile(request, username):
+    user = get_object_or_404(User, username=username)
+    posts = Post.objects.filter(author=user)  # Предполагается, что у вас есть поле author в модели Post
+    return render(request, 'registration/profile.html', {'user': user, 'posts': posts})
