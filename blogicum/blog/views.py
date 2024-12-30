@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from .forms import PostForm, CommentForm
+from .forms import PostForm, CommentForm, UserProfileForm
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
@@ -167,29 +167,19 @@ def post_list(request):
 
 @login_required
 def edit_profile(request, username):
-    # Получаем пользователя по имени
     user = get_object_or_404(User, username=username)
     if request.method == 'POST':
-        # Обновляем поля пользователя
-        user.username = request.POST.get('username')
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.email = request.POST.get('email')  # Добавлено поле email
-
-        # Сохраняем изменения в базе данных
-        user.save()
-        # Перенаправление на страницу профиля
-        return redirect('blog:profile', username=user.username)
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('blog:profile', username=user.username)
+    else:
+        form = UserProfileForm(instance=user)
 
     context = {
-        'form': {
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,  # Добавлено поле email
-        }
+        'form': form,
     }
-    return render(request, 'registration/edit_profile.html', context)
+    return render(request, 'blog/user.html', context)
 
 
 @login_required
@@ -244,6 +234,7 @@ def add_comment(request, post_id):
 @login_required
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    # Проверяем, что текущий пользователь является автором комментария
     if comment.author != request.user:
         return redirect('blog:post_detail', id=post_id)
 
@@ -255,18 +246,16 @@ def edit_comment(request, post_id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'blog/comment.html',
-                  {'form': form, 'comment': comment})
+    return render(request, 'blog/comment.html', {'form': form, 'comment': comment})
 
 
 @login_required
 def delete_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    # Проверяем, что текущий пользователь является автором комментария
     if comment.author == request.user:
         comment.delete()
-        return redirect('blog:post_detail', id=post_id)
-    else:
-        return redirect('blog:post_detail', id=post_id)
+    return redirect('blog:post_detail', id=post_id)
 
 
 def custom_login_view(request):
