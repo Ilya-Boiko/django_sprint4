@@ -246,7 +246,8 @@ def edit_comment(request, post_id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'blog/comment.html', {'form': form, 'comment': comment})
+    return render(request, 'blog/comment.html',
+                  {'form': form, 'comment': comment})
 
 
 @login_required
