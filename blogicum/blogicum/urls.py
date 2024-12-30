@@ -22,8 +22,11 @@ from blog import views  # Импортируем views из приложения
 #  from pages.views import custom_403_view, custom_404_view, custom_500_view
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.defaults import server_error
+from pages.views import custom_500_view, custom_404_view  # Импортируем ваши обработчики
 
-#  handler404 = 'pages.views.custom_404_view'
+handler500 = 'pages.views.custom_500_view'  # Обработчик для 500 ошибок
+handler404 = 'pages.views.custom_404_view'  # Обработчик для 404 ошибок
 #  handler403 = 'pages.views.custom_403_view'
 #  handler500 = 'pages.views.custom_500_view'
 
