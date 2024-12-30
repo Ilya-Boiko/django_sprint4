@@ -45,7 +45,8 @@ class Post(BaseModel):
         blank=False,
         verbose_name='Категория'
     )
-    image = models.ImageField(upload_to='post_images/', blank=True, null=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='post_images/',
+                              blank=True, null=True, verbose_name='Изображение')
 
     class Meta:
         verbose_name = 'публикация'
@@ -86,10 +87,13 @@ class Location(BaseModel):
 
 
 class Comment(models.Model):
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Автор комментария')
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Автор комментария')
     text = models.TextField(verbose_name='Текст комментария')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время добавления')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='Публикация')
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата и время добавления')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE,
+                             related_name='comments', verbose_name='Публикация')
 
     class Meta:
         verbose_name = 'комментарий'

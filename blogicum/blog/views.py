@@ -43,6 +43,7 @@ def post_detail(request, id):
     if post.pub_date > timezone.now() and post.author != request.user:
         raise Http404("Пост не найден.")
 
+    # Если пост не опубликован, но автор - текущий пользователь, показываем пост
     if not post.is_published and post.author == request.user:
         comments = post.comments.all()  # Получаем все комментарии к посту
         form = CommentForm()  # Создаем экземпляр формы комментария
@@ -253,21 +254,16 @@ def edit_comment(request, post_id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'blog/comment.html',
-                  {'form': form, 'comment': comment})
+    return render(request, 'blog/comment.html', {'form': form, 'comment': comment})
 
 
 @login_required
 def delete_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-
-    # Проверяем, что текущий пользователь является автором комментария
     if comment.author == request.user:
-        comment.delete()  # Удаляем комментарий
-        # Перенаправление на страницу поста
+        comment.delete()
         return redirect('blog:post_detail', id=post_id)
     else:
-        # Перенаправление на страницу поста
         return redirect('blog:post_detail', id=post_id)
 
 
