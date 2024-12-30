@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User = get_user_model()
 
@@ -44,6 +45,7 @@ class Post(BaseModel):
         blank=False,
         verbose_name='Категория'
     )
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True, verbose_name='Изображение')
 
     class Meta:
         verbose_name = 'публикация'
@@ -81,3 +83,18 @@ class Location(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Comment(models.Model):
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Автор комментария')
+    text = models.TextField(verbose_name='Текст комментария')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата и время добавления')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='Публикация')
+
+    class Meta:
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'Комментарии'
+        ordering = ['created_at']  # Сортировка по времени создания
+
+    def __str__(self):
+        return f'Комментарий от {self.author} к {self.post.title}'

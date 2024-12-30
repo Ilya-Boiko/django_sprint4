@@ -18,6 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views  # Импортируем представления для аутентификации
 from blog import views  # Импортируем views из приложения blog
+from django.conf.urls import handler404, handler403, handler500
+from pages.views import custom_403_view, custom_404_view, custom_500_view
+from django.conf import settings
+from django.conf.urls.static import static
+
+# Убедитесь, что обработчики ошибок определены
+handler404 = 'pages.views.custom_404_view'
+handler403 = 'pages.views.custom_403_view'
+handler500 = 'pages.views.custom_500_view'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,12 +34,10 @@ urlpatterns = [
     # Включаем маршруты приложения pages
     path('pages/', include('pages.urls')),
     # Подключаем маршруты для аутентификации
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('accounts/password_change/', auth_views.PasswordChangeView.as_view(template_name='registration/password_change.html'), name='password_change'),
-    path('accounts/password_change/done/', auth_views.PasswordChangeDoneView.as_view(template_name='registration/password_change_done.html'), name='password_change_done'),
-    path('accounts/password_reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset.html'), name='password_reset'),
-    path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name='password_reset_done'),
-    path('accounts/registration/', views.registration, name='registration'),  # Страница регистрации
+    path('auth/', include('django.contrib.auth.urls')),  # Измените на 'auth/'
+    path('auth/registration/', views.registration, name='registration'),  # Измените на 'auth/registration/'
     path('profile/<str:username>/', views.profile, name='profile'),  # Страница профиля пользователя
-]
+    path('profile/<str:username>/edit/', views.edit_profile, name='edit_profile'),  # Добавьте этот маршрут
+    path('posts/create/', views.create_post, name='create_post'),  # Добавлено для создания поста
+    path('posts/<int:post_id>/edit/', views.edit_post, name='edit_post'),  # Добавлено для редактирования поста
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

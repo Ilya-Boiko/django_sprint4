@@ -11,4 +11,4 @@ class UserModelAdapter(ModelAdapter):
         if isclass(self._item_or_cls):
             return "last_name"
         else:
-            return self.last_name.replace("\n", "")
+            return self._item_or_cls.last_name.replace("\n", "")
