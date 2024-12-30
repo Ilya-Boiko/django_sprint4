@@ -16,17 +16,16 @@ Including another URLconf
 from django.contrib import admin
 # Импортируем include для включения маршрутов приложений
 from django.urls import path, include
-from django.contrib.auth import views as auth_views  # Импортируем представления для аутентификации
+#  from django.contrib.auth import views as auth_views
 from blog import views  # Импортируем views из приложения blog
-from django.conf.urls import handler404, handler403, handler500
-from pages.views import custom_403_view, custom_404_view, custom_500_view
+#  from django.conf.urls import handler404, handler403, handler500
+#  from pages.views import custom_403_view, custom_404_view, custom_500_view
 from django.conf import settings
 from django.conf.urls.static import static
 
-# Убедитесь, что обработчики ошибок определены
-handler404 = 'pages.views.custom_404_view'
-handler403 = 'pages.views.custom_403_view'
-handler500 = 'pages.views.custom_500_view'
+#  handler404 = 'pages.views.custom_404_view'
+#  handler403 = 'pages.views.custom_403_view'
+#  handler500 = 'pages.views.custom_500_view'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,9 +34,14 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     # Подключаем маршруты для аутентификации
     path('auth/', include('django.contrib.auth.urls')),  # Измените на 'auth/'
-    path('auth/registration/', views.registration, name='registration'),  # Измените на 'auth/registration/'
-    path('profile/<str:username>/', views.profile, name='profile'),  # Страница профиля пользователя
-    path('profile/<str:username>/edit/', views.edit_profile, name='edit_profile'),  # Добавьте этот маршрут
-    path('posts/create/', views.create_post, name='create_post'),  # Добавлено для создания поста
-    path('posts/<int:post_id>/edit/', views.edit_post, name='edit_post'),  # Добавлено для редактирования поста
+    # Измените на 'auth/registration/'
+    path('auth/registration/', views.registration, name='registration'),
+    path('profile/<str:username>/', views.profile,
+         name='profile'),  # Страница профиля пользователя
+    path('profile/<str:username>/edit/', views.edit_profile,
+         name='edit_profile'),  # Добавьте этот маршрут
+    # Добавлено для создания поста
+    path('posts/create/', views.create_post, name='create_post'),
+    path('posts/<int:post_id>/edit/', views.edit_post,
+         name='edit_post'),  # Добавлено для редактирования поста
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
