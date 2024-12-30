@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% block title %}
+  Подтверждение удаления комментария
+{% endblock %}
+{% block content %}
+  <div class="col d-flex justify-content-center">
+    <div class="card" style="width: 40rem;">
+      <div class="card-header">
+        Подтверждение удаления комментария
+      </div>
+      <div class="card-body">
+        <p>Вы уверены, что хотите удалить следующий комментарий?</p>
+        <p><strong>{{ comment.text }}</strong></p>
+        <form method="post" action="{% url 'blog:delete_comment' post.id comment.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Удалить комментарий</button>
+          <a href="{% url 'blog:post_detail' post.id %}" class="btn btn-secondary">Отмена</a>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %} 

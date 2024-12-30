@@ -134,24 +134,18 @@ def create_post(request):
 @login_required
 def edit_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-
-    # Проверяем, что текущий пользователь является автором поста
     if post.author != request.user:
-        # Перенаправление на страницу просмотра поста
-        return redirect('post_detail', id=post.id)
+        return redirect('blog:post_detail', id=post.id)
 
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES,
-                        instance=post)  # Обработка файлов
+        form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
-            # Перенаправление на страницу отредактированной публикации
-            return redirect('post_detail', id=post.id)
+            return redirect('blog:post_detail', id=post.id)
     else:
         form = PostForm(instance=post)
 
-    # Используем тот же шаблон, что и для создания поста
-    return render(request, 'blog/create.html', {'form': form})
+    return render(request, 'blog/create.html', {'form': form, 'post': post})
 
 
 def post_list(request):
@@ -203,16 +197,45 @@ def profile_page(request):
 
 
 @login_required
+def confirm_delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if post.author != request.user:
+        return redirect('blog:post_detail', id=post.id)
+
+    context = {
+        'post': post,
+        'form': None,  # Передаем None, так как форма не нужна
+    }
+    return render(request, 'blog/create.html', context)
+
+@login_required
 def delete_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-
-    # Проверяем, что текущий пользователь является автором поста
     if post.author == request.user:
-        post.delete()  # Удаляем пост
-        return redirect('blog:index')  # Перенаправление на главную страницу
-    else:
-        # Перенаправление на страницу просмотра поста
-        return redirect('post_detail', id=post.id)
+        post.delete()
+    return redirect('blog:index')
+
+
+@login_required
+def confirm_delete_comment(request, post_id, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    if comment.author != request.user:
+        return redirect('blog:post_detail', id=post_id)
+
+    context = {
+        'comment': comment,
+        'post': get_object_or_404(Post, id=post_id),
+        'form': None,  # Передаем None, так как форма не нужна
+    }
+    return render(request, 'blog/comment.html', context)
+
+
+@login_required
+def delete_comment(request, post_id, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
+    if comment.author == request.user:
+        comment.delete()  # Удаляем комментарий
+    return redirect('blog:post_detail', id=post_id)
 
 
 @login_required
@@ -234,7 +257,6 @@ def add_comment(request, post_id):
 @login_required
 def edit_comment(request, post_id, comment_id):
     comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-    # Проверяем, что текущий пользователь является автором комментария
     if comment.author != request.user:
         return redirect('blog:post_detail', id=post_id)
 
@@ -248,15 +270,6 @@ def edit_comment(request, post_id, comment_id):
 
     return render(request, 'blog/comment.html',
                   {'form': form, 'comment': comment})
-
-
-@login_required
-def delete_comment(request, post_id, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, post_id=post_id)
-    # Проверяем, что текущий пользователь является автором комментария
-    if comment.author == request.user:
-        comment.delete()
-    return redirect('blog:post_detail', id=post_id)
 
 
 def custom_login_view(request):

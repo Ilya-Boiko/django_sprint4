@@ -13,8 +13,10 @@ urlpatterns = [
          name='create_post'),  # Страница создания поста
     path('posts/<int:post_id>/edit/', views.edit_post,
          name='edit_post'),  # Страница редактирования поста
-    path('posts/<int:post_id>/delete/', views.delete_post,
-         name='delete_post'),  # Страница удаления поста
+    path('posts/<int:post_id>/delete/', views.confirm_delete_post,
+         name='confirm_delete_post'),
+    path('posts/<int:post_id>/delete/confirm/', views.delete_post,
+         name='delete_post'),
     path('profile/<str:username>/', views.profile,
          name='profile'),  # Страница профиля пользователя
     path('auth/registration/', views.registration,
@@ -28,5 +30,7 @@ urlpatterns = [
     path('posts/<int:post_id>/edit_comment/<int:comment_id>/',
          views.edit_comment, name='edit_comment'),
     path('posts/<int:post_id>/delete_comment/<int:comment_id>/',
+         views.confirm_delete_comment, name='confirm_delete_comment'),
+    path('posts/<int:post_id>/delete_comment/<int:comment_id>/confirm/',
          views.delete_comment, name='delete_comment'),  # Удаление комментария
 ]
