@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from .forms import PostForm, UserProfileForm, CommentForm
+from .forms import PostForm, CommentForm
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils import timezone
@@ -43,7 +43,8 @@ def post_detail(request, id):
     if post.pub_date > timezone.now() and post.author != request.user:
         raise Http404("Пост не найден.")
 
-    # Если пост не опубликован, но автор - текущий пользователь, показываем пост
+    # Если пост не опубликован, но автор - текущий пользователь,
+    # показываем пост
     if not post.is_published and post.author == request.user:
         comments = post.comments.all()  # Получаем все комментарии к посту
         form = CommentForm()  # Создаем экземпляр формы комментария
@@ -254,7 +255,8 @@ def edit_comment(request, post_id, comment_id):
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'blog/comment.html', {'form': form, 'comment': comment})
+    return render(request, 'blog/comment.html',
+                  {'form': form, 'comment': comment})
 
 
 @login_required
