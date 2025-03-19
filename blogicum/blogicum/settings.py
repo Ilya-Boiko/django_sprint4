@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uq=09@fh#+#nelm3_m$b+u6v=utidmpb5n6o+dab9ba-!#sg$m'
+SECRET_KEY = 'django-insecure-sv$!l^ly@*aj*a59_nmsxl-q%k(x^1$g&d@x#kw5=^3qzfm1d='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = [
+    'www.vilmen.pythonanywhere.com',
+    'vilmen.pythonanywhere.com',
+]
 
 
 # Application definition
@@ -40,11 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
     'django_bootstrap5',
-]
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static_dev',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +57,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+]
+
+INTERNAL_IPS = [
+    '127.0.0.1',
 ]
 
 ROOT_URLCONF = 'blogicum.urls'
@@ -64,13 +71,7 @@ TEMPLATES_DIR = BASE_DIR / 'templates'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # Указываем, в каких директориях искать HTML-шаблоны.
         'DIRS': [TEMPLATES_DIR],
-
-        # Оставляем True: шаблоны приложений будут искаться
-        # не только на уровне проекта, но и в директориях приложений.
-        # Это необходимо для работы
-        # встроенных приложений (например админки).
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,9 +79,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ]
+            ],
         },
-    }
+    },
 ]
 
 WSGI_APPLICATION = 'blogicum.wsgi.application'
@@ -133,25 +134,28 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Добавляем обработку ошибок
-handler403 = 'django.views.defaults.permission_denied'
-handler404 = 'django.views.defaults.page_not_found'
-handler500 = 'django.views.defaults.server_error'
+CSRF_FAILURE_VIEW = 'pages.views.csrf_failure'
 
-# Добавьте MEDIA_URL и MEDIA_ROOT
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+LOGIN_REDIRECT_URL = 'pages:about'
 
-# Настройки для отправки электронной почты
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'  # Путь для сохранения отправленных писем
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
+STATIC_URL = '/static/'
 
-LOGIN_REDIRECT_URL = '/'  # Путь к главной странице
+STATICFILES_DIRS = [
+    BASE_DIR / 'static/',
+]
+
+MEDIA_ROOT = BASE_DIR / 'media/'
+
+# MEDIA_URL = 'media/'
+
+if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")

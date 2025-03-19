@@ -1,49 +1,30 @@
-"""blogicum URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-# Импортируем include для включения маршрутов приложений
-from django.urls import path, include
-#  from django.contrib.auth import views as auth_views
-from blog import views  # Импортируем views из приложения blog
-#  from django.conf.urls import handler404, handler403, handler500
-#  from pages.views import custom_403_view, custom_404_view, custom_500_view
+from django.urls import include, path, reverse_lazy
 from django.conf import settings
-from django.conf.urls.static import static
-# from django.views.defaults import server_error
+from django.views.generic.edit import CreateView
+from django.contrib.auth.forms import UserCreationForm
 
-handler500 = 'pages.views.custom_500_view'  # Обработчик для 500 ошибок
-handler404 = 'pages.views.custom_404_view'  # Обработчик для 404 ошибок
-#  handler403 = 'pages.views.custom_403_view'
-#  handler500 = 'pages.views.custom_500_view'
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('blog.urls')),  # Включаем маршруты приложения blog
-    # Включаем маршруты приложения pages
     path('pages/', include('pages.urls')),
-    # Подключаем маршруты для аутентификации
-    path('auth/', include('django.contrib.auth.urls')),  # Измените на 'auth/'
-    # Измените на 'auth/registration/'
-    path('auth/registration/', views.registration, name='registration'),
-    path('profile/<str:username>/', views.profile,
-         name='profile'),  # Страница профиля пользователя
-    path('profile/<str:username>/edit/', views.edit_profile,
-         name='edit_profile'),  # Добавьте этот маршрут
-    # Добавлено для создания поста
-    path('posts/create/', views.create_post, name='create_post'),
-    path('posts/<int:post_id>/edit/', views.edit_post,
-         name='edit_post'),  # Добавлено для редактирования поста
+    path('', include('blog.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
+    path(
+        'auth/registration/',
+        CreateView.as_view(
+            template_name='registration/registration_form.html',
+            form_class=UserCreationForm,
+            success_url=reverse_lazy('blog:index'),
+        ),
+        name='registration',
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += (path('__debug__/', include(debug_toolbar.urls)),)
+
+handler404 = 'pages.views.page_not_found'
+handler500 = 'pages.views.failure_500'

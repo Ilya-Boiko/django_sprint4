@@ -12,19 +12,8 @@
       <div class="card-body">
         <form method="post">
           {% csrf_token %}
-          <div class="form-group">
-            <label for="id_username">Имя пользователя:</label>
-            <input type="text" name="username" class="form-control" id="id_username" value="{{ form.username|default:'' }}" required>
-          </div>
-          <div class="form-group">
-            <label for="id_first_name">Имя:</label>
-            <input type="text" name="first_name" class="form-control" id="id_first_name" value="{{ form.first_name|default:'' }}">
-          </div>
-          <div class="form-group">
-            <label for="id_last_name">Фамилия:</label>
-            <input type="text" name="last_name" class="form-control" id="id_last_name" value="{{ form.last_name|default:'' }}">
-          </div>
-          <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+          {% bootstrap_form form %}
+          {% bootstrap_button button_type="submit" content="Отправить" %}
         </form>
       </div>
     </div>
